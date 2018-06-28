@@ -93,7 +93,7 @@ RUN echo "installing sdk tools" && \
 # Install SDKs
 # Please keep these in descending order!
 # The `yes` is for accepting all non-standard tool licenses.
-    mkdir --parents "$HOME/.android/" && \
+RUN mkdir --parents "$HOME/.android/" && \
     echo '### User Sources for Android SDK Manager' > \
         "$HOME/.android/repositories.cfg" && \
     yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses > /dev/null && \
