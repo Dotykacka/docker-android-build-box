@@ -1,10 +1,7 @@
 # Docker Android Build Box
 
 
-[![Build Status](https://travis-ci.org/mingchen/docker-android-build-box.svg?branch=master)](https://travis-ci.org/mingchen/docker-android-build-box)
-
-[![docker icon](http://dockeri.co/image/mingc/android-build-box)](https://hub.docker.com/r/mingc/android-build-box/)
-
+[![Build Status](https://travis-ci.com/Dotykacka/docker-android-build-box.svg?branch=master)](https://travis-ci.com/Dotykacka/docker-android-build-box)
 
 ## Introduction
 
@@ -16,8 +13,8 @@ A **docker** image build with **Android** build environment.
 It includes the following components:
 
 * Ubuntu 17.10
-* Android SDK 16 17 18 19 20 21 22 23 24 25 26 27
-* Android build tools 17.0.0 18.1.1 19.1.0 20.0.0 21.1.2 22.0.1 23.0.1 23.0.2 23.0.3 24.0.0 24.0.1 24.0.2 24.0.3 25.0.0 25.0.1 25.0.2 25.0.3 26.0.0 26.0.1 26.0.2 27.0.1 27.0.2 27.0.3
+* Android SDK 27
+* Android build tools 27.0.3
 * Android NDK r15c
 * extra-android-m2repository
 * extra-google-m2repository
@@ -35,7 +32,7 @@ It includes the following components:
 
 The docker image is publicly automated build on [Docker Hub](https://hub.docker.com/r/mingc/android-build-box/) based on the Dockerfile in this repo, so there is no hidden stuff in it. To pull the latest docker image:
 
-    docker pull mingc/android-build-box:latest
+    docker pull dotykacka/docker-android-build-box:latest
 
 
 ## Usage
@@ -45,7 +42,7 @@ The docker image is publicly automated build on [Docker Hub](https://hub.docker.
 You can use this docker image to build your Android project with a single docker command:
 
     cd <android project directory>  # change working directory to your project root directory.
-    docker run --rm -v `pwd`:/project mingc/android-build-box bash -c 'cd /project; ./gradlew build'
+    docker run --rm -v `pwd`:/project dotykacka/docker-android-build-box bash -c 'cd /project; ./gradlew build'
 
 
 
