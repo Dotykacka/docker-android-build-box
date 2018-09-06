@@ -1,19 +1,10 @@
 FROM ubuntu:17.10
 
-MAINTAINER Ming Chen
-
 ENV ANDROID_HOME="/opt/android-sdk" \
-#    ANDROID_NDK="/opt/android-ndk" \
     JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 
 # Get the latest version from https://developer.android.com/studio/index.html
-ENV ANDROID_SDK_TOOLS_VERSION="3859397"
-
-# Get the latest version from https://developer.android.com/ndk/downloads/index.html
-#ENV ANDROID_NDK_VERSION="15c"
-
-# nodejs version
-ENV NODE_VERSION="8.x"
+ENV ANDROID_SDK_TOOLS_VERSION="4333796"
 
 # Set locale
 ENV LANG="en_US.UTF-8" \
@@ -26,13 +17,13 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 
 # Variables must be references after they are created
 ENV ANDROID_SDK_HOME="$ANDROID_HOME"
-#ENV ANDROID_NDK_HOME="$ANDROID_NDK/android-ndk-r$ANDROID_NDK_VERSION"
 
-ENV PATH="$PATH:$ANDROID_SDK_HOME/tools:$ANDROID_SDK_HOME/platform-tools:$ANDROID_NDK"
+ENV PATH="$PATH:$ANDROID_SDK_HOME/emulator:$ANDROID_SDK_HOME/tools:$ANDROID_SDK_HOME/platform-tools:$ANDROID_HOME/tools/bin"
 
-COPY README.md /README.md
-
-WORKDIR /tmp
+RUN export LC_CTYPE=en_US.UTF-8
+RUN export LC_ALL=en_US.UTF-8
+RUN export LANG=en_US.UTF-8
+RUN export LANGUAGE=en_US.UTF-8
 
 # Installing packages
 RUN apt-get update -qq > /dev/null && \
@@ -41,8 +32,8 @@ RUN apt-get update -qq > /dev/null && \
     apt-get install -qq --no-install-recommends \
         build-essential \
         autoconf \
-        curl \
         git \
+        file \
         lib32stdc++6 \
         lib32z1 \
         lib32z1-dev \
@@ -59,31 +50,18 @@ RUN apt-get update -qq > /dev/null && \
         openjdk-8-jdk \
         openssh-client \
         pkg-config \
-        python-software-properties \
-        ruby-full \
         software-properties-common \
         unzip \
         wget \
         zip \
-        zlib1g-dev > /dev/null && \
-    echo "installing nodejs, npm, cordova, ionic, react-native" && \
-    curl -sL -k https://deb.nodesource.com/setup_${NODE_VERSION} \
-        | bash - > /dev/null && \
-    apt-get install -qq nodejs > /dev/null && \
-    apt-get clean > /dev/null && \
-    rm -rf /var/lib/apt/lists/ && \
-    npm install --quiet -g npm > /dev/null && \
-    npm install --quiet -g \
-        bower cordova eslint gulp \
-        ionic jshint karma-cli mocha \
-        node-gyp npm-check-updates \
-        react-native-cli > /dev/null && \
-    npm cache clean --force > /dev/null && \
-    rm -rf /tmp/* /var/tmp/* && \
-    echo "installing fastlane" && \
-    gem install fastlane --quiet --no-document > /dev/null
+        zlib1g-dev > /dev/null 
+
+WORKDIR /tmp
 
 # Install Android SDK
+RUN mkdir -p ~/.android && \
+    touch ~/.android/repositories.cfg
+
 RUN echo "installing sdk tools" && \
     wget --quiet --output-document=sdk-tools.zip \
         "https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS_VERSION}.zip" && \
@@ -105,7 +83,7 @@ RUN mkdir --parents "$HOME/.android/" && \
         "platform-tools" && \
     echo "installing build tools " && \
     yes | "$ANDROID_HOME"/tools/bin/sdkmanager \
-        "build-tools;27.0.3" "build-tools;27.0.2" "build-tools;27.0.1" && \
+        "build-tools;27.0.3" && \
     echo "installing extras " && \
     yes | "$ANDROID_HOME"/tools/bin/sdkmanager \
         "extras;android;m2repository" \
@@ -113,9 +91,22 @@ RUN mkdir --parents "$HOME/.android/" && \
     echo "installing play services " && \
     yes | "$ANDROID_HOME"/tools/bin/sdkmanager \
         "extras;google;google_play_services" \
-        "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2" \
-        "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.1"
+        "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2" && \
+    echo "installing Google APIs" && \
+    yes | "$ANDROID_HOME"/tools/bin/sdkmanager \
+        "add-ons;addon-google_apis-google-22" && \
+    echo "installing emulator " && \
+    yes | "$ANDROID_HOME"/tools/bin/sdkmanager "emulator" && \
+    echo "installing system images" && \
+    yes | "$ANDROID_HOME"/tools/bin/sdkmanager \
+        "system-images;android-22;default;armeabi-v7a"
 
 # Copy sdk license agreement files.
 RUN mkdir -p $ANDROID_HOME/licenses
 COPY sdk/licenses/* $ANDROID_HOME/licenses/
+
+# Create android emulator
+RUN echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name arm --abi default/armeabi-v7a --package 'system-images;android-22;default;armeabi-v7a' -p $ANDROID_HOME/.android/avd/arm.avd
+
+COPY scripts /tmp/scripts
+
