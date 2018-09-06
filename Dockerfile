@@ -32,6 +32,7 @@ RUN apt-get update -qq > /dev/null && \
     apt-get install -qq --no-install-recommends \
         build-essential \
         autoconf \
+		curl \
         git \
         file \
         lib32stdc++6 \
@@ -50,6 +51,7 @@ RUN apt-get update -qq > /dev/null && \
         openjdk-8-jdk \
         openssh-client \
         pkg-config \
+		ruby-full \
         software-properties-common \
         unzip \
         wget \
@@ -108,5 +110,6 @@ COPY sdk/licenses/* $ANDROID_HOME/licenses/
 # Create android emulator
 RUN echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name arm --abi default/armeabi-v7a --package 'system-images;android-22;default;armeabi-v7a' -p $ANDROID_HOME/.android/avd/arm.avd
 
-COPY scripts /tmp/scripts
-
+RUN echo "installing fastlane" && \
+    gem install fastlane --quiet --no-document > /dev/null
+	
