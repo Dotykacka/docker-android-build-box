@@ -32,7 +32,7 @@ RUN apt-get update -qq > /dev/null && \
     apt-get install -qq --no-install-recommends \
         build-essential \
         autoconf \
-		curl \
+        curl \
         git \
         file \
         lib32stdc++6 \
@@ -51,7 +51,7 @@ RUN apt-get update -qq > /dev/null && \
         openjdk-8-jdk \
         openssh-client \
         pkg-config \
-		ruby-full \
+        ruby-full \
         software-properties-common \
         unzip \
         wget \
@@ -112,4 +112,5 @@ RUN echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name arm -
 
 RUN echo "installing fastlane" && \
     gem install fastlane --quiet --no-document > /dev/null
+	
 	
